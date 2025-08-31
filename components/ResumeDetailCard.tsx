@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { auth} from '@/app/firebase'
+import { auth} from '@/lib/firebase'
 import { onAuthStateChanged, User } from 'firebase/auth';
 import ScoreCircle from './Score';
 

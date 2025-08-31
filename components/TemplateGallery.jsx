@@ -5,22 +5,32 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Template1 from "@/templates/Template1"
 import Template2 from "@/templates/Template2"
 import Template3 from "@/templates/Template3"
+import Template4 from "@/templates/Template4"
+import Template5 from "@/templates/Template5"
+import Template6 from "@/templates/Template6"
+import Template7 from "@/templates/Template7"
 import { cn } from "@/lib/utils"
 
 const templateComponentMap = {
   template1: Template1,
   template2: Template2,
   template3: Template3,
+  template4: Template4,
+  template5: Template5,
+  template6: Template6,
+  template7: Template7,
 }
 
 export default function TemplateGallery({ templates, selectedTemplate, onSelect, resume }) {
   return (
-    <div className="grid grid-cols-1 gap-4 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
       {templates.map((tpl) => {
         const TplComp = templateComponentMap[tpl.id]
         return (
           <Card
             key={tpl.id}
+            onClick={() => onSelect(tpl.id)}
+            style={{ cursor: "pointer" }}
             className={cn(
               "overflow-hidden transition-all duration-200",
               selectedTemplate === tpl.id

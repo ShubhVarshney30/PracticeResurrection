@@ -7,13 +7,13 @@ import { AnimatePresence, motion } from "framer-motion"
 import resumeData from "./data/resumeData.json"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import TemplateGallery from "@/components/TemplateGallery"
 import ResumePreview from "@/components/ResumePre"
 
 export default function Page() {
+  const [showGallery, setShowGallery] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState("template1")
   const [fontClass, setFontClass] = useState("font-sans")
   const previewRef = useRef<HTMLDivElement | null>(null)
@@ -24,11 +24,19 @@ export default function Page() {
       { id: "template1", name: "Modern Minimalist" },
       { id: "template2", name: "Corporate Professional" },
       { id: "template3", name: "Creative Design" },
+      { id: "template4", name: "ATS Compact" },
+      { id: "template5", name: "Elegant Sidebar" },
+      { id: "template6", name: "Timeline Pro" },
+      { id: "template7", name: "Bold Header" },
     ],
     [],
   )
 
-  // Custom print handler (no external deps)
+  const handleSelectTemplate = (id: string) => {
+    setSelectedTemplate(id)
+    setShowGallery(false)
+  }
+
   const handlePrint = () => {
     if (typeof window === "undefined") return
     const node = previewRef.current
@@ -37,9 +45,8 @@ export default function Page() {
     const printWindow = window.open("", "", "width=820,height=1100")
     if (!printWindow) return
 
-    // Copy current styles (Tailwind/shadcn) to print window
     const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-      .map((el) => el.outerHTML)
+      .map((el) => (el as HTMLElement).outerHTML)
       .join("")
 
     const pageStyle = `
@@ -81,8 +88,19 @@ export default function Page() {
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary align-middle" />
             Resume Maker — Professional Templates
           </h1>
+
           <div className="flex items-center gap-2 no-print">
-            <Select value={fontClass} onValueChange={setFontClass}>
+            {!showGallery && (
+              <Button
+                variant="outline"
+                onClick={() => setShowGallery(true)}
+                className="transition-colors hover:bg-primary/5"
+              >
+                Back to Gallery
+              </Button>
+            )}
+
+            <Select value={fontClass} onValueChange={setFontClass} disabled={showGallery}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Font" />
               </SelectTrigger>
@@ -101,76 +119,62 @@ export default function Page() {
               {theme === "dark" ? "Light Mode" : "Dark Mode"}
             </Button> */}
 
-            <Button onClick={handlePrint} className="transition-transform hover:-translate-y-0.5">
+            <Button
+              onClick={handlePrint}
+              className="transition-transform hover:-translate-y-0.5"
+              disabled={showGallery}
+            >
               Download PDF
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6">
-        <div className="grid gap-6 md:grid-cols-10">
-          {/* Sidebar (30%) */}
-          <aside className="md:col-span-3">
-            <Card className="no-print transition-shadow hover:shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base">Template Gallery</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[70vh]">
-                  <TemplateGallery
-                    templates={templates}
-                    selectedTemplate={selectedTemplate}
-                    onSelect={setSelectedTemplate}
+      {showGallery ? (
+        <main className="mx-auto max-w-7xl px-4 py-6">
+          <Card className="transition-shadow hover:shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-base">Choose a Template</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="min-h-[70vh]">
+                <TemplateGallery
+                  templates={templates}
+                  selectedTemplate={selectedTemplate}
+                  onSelect={handleSelectTemplate}
+                  resume={resumeData as any}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      ) : (
+        <main className="mx-auto max-w-7xl px-4 py-6">
+          <Card className="transition-shadow hover:shadow-sm">
+            <CardHeader className="no-print">
+              <CardTitle className="text-base">Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedTemplate + fontClass}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ResumePreview
+                    ref={previewRef}
                     resume={resumeData as any}
+                    templateKey={selectedTemplate}
+                    fontClass={fontClass}
                   />
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            <Card className="mt-6 no-print transition-shadow hover:shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base">AI Suggestions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Coming soon: Get AI-powered suggestions to improve your resume content.
-                </p>
-                <Button disabled variant="outline" className="w-full bg-transparent">
-                  Ask AI (placeholder)
-                </Button>
-              </CardContent>
-            </Card>
-          </aside>
-
-          {/* Main Area (70%) */}
-          <section className="md:col-span-7">
-            <Card className="transition-shadow hover:shadow-sm">
-              <CardHeader className="no-print">
-                <CardTitle className="text-base">Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={selectedTemplate + fontClass}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ResumePreview
-                      ref={previewRef}
-                      resume={resumeData as any}
-                      templateKey={selectedTemplate}
-                      fontClass={fontClass}
-                    />
-                  </motion.div>
-                </AnimatePresence>
-              </CardContent>
-            </Card>
-          </section>
-        </div>
-      </main>
+                </motion.div>
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+        </main>
+      )}
     </div>
   )
 }
