@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { UserProfile } from "./user-profile";
+import { useAuth } from "./auth-provider";
+
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism border-b border-white/10">
@@ -14,7 +18,7 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <h1 className="text-2xl font-bold gradient-text">
-              TalentElse
+              Resume Builder
             </h1>
           </div>
 
@@ -33,6 +37,14 @@ const Navigation = () => {
               >
                 Builder
               </Link>
+              {isAuthenticated && (
+                <Link
+                  href="/dashboard"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
+                >
+                  Dashboard
+                </Link>
+              )}
               <Link
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
@@ -62,12 +74,27 @@ const Navigation = () => {
 
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm">
-              Start Building
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Link href="/profile">
+                  <Button variant="ghost" size="sm">
+                    Profile
+                  </Button>
+                </Link>
+                <UserProfile />
+              </>
+            ) : (
+              <>
+                <Link href="/auth/signin">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Button size="sm">
+                  Start Building
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -99,6 +126,14 @@ const Navigation = () => {
             >
               Builder
             </Link>
+            {isAuthenticated && (
+              <Link
+                href="/dashboard"
+                className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
+              >
+                Dashboard
+              </Link>
+            )}
             <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
@@ -124,12 +159,29 @@ const Navigation = () => {
               Contact
             </Link>
             <div className="px-3 py-2 space-y-2">
-              <Button variant="ghost" size="sm" className="w-full">
-                Sign In
-              </Button>
-              <Button size="sm" className="w-full">
-                Start Building
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Link href="/profile" className="w-full">
+                    <Button variant="ghost" size="sm" className="w-full">
+                      Profile
+                    </Button>
+                  </Link>
+                  <div className="flex justify-center">
+                    <UserProfile />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/signin" className="w-full">
+                    <Button variant="ghost" size="sm" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Button size="sm" className="w-full">
+                    Start Building
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
