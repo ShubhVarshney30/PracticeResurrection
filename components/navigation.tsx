@@ -46,7 +46,7 @@ const Navigation = () => {
                 </Link>
               )}
               <Link
-                href="/templates"
+                href="/template"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Templates
@@ -135,7 +135,7 @@ const Navigation = () => {
               </Link>
             )}
             <Link
-              href="/templates"
+              href="/template"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Templates
