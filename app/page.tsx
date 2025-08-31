@@ -4,8 +4,7 @@ import HeroSection from "@/components/heroSection";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <main>
+      <main className="mt-3">
         <HeroSection />
       </main>
     </div>

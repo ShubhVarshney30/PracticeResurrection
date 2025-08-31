@@ -21,42 +21,42 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <a
+              <Link
                 href="/#"
                 className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Home
-              </a>
+              </Link>
               <Link
                 href="/builder"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Builder
               </Link>
-              <a
+              <Link
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Templates
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/atsScore"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 ATS Score
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 About
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Contact
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -87,47 +87,47 @@ const Navigation = () => {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 glass-morphism border-t border-white/10">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="block px-3 py-2 text-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Home
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Builder
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Templates
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               ATS Score
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               About
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Contact
-            </a>
+            </Link>
             <div className="px-3 py-2 space-y-2">
               <Button variant="ghost" size="sm" className="w-full">
                 Sign In
               </Button>
-              <Button  size="sm" className="w-full">
+              <Button size="sm" className="w-full">
                 Start Building
               </Button>
             </div>
