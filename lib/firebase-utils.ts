@@ -1,5 +1,5 @@
 import { ref, set, get, push, remove, update, query, orderByChild, limitToFirst, onValue, off } from 'firebase/database';
-import { db } from './firebase';
+import { db } from '@/lib/firebase';
 
 // User management functions
 export const createUser = async (userId: string, userData: any) => {

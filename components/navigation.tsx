@@ -46,7 +46,7 @@ const Navigation = () => {
                 </Link>
               )}
               <Link
-                href="#"
+                href="/templates"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Templates
@@ -58,13 +58,13 @@ const Navigation = () => {
                 ATS Score
               </Link>
               <Link
-                href="#"
+                href="/about"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 About
               </Link>
               <Link
-                href="#"
+                href="/contact"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 Contact
@@ -121,7 +121,7 @@ const Navigation = () => {
               Home
             </Link>
             <Link
-              href="#"
+              href="/builder"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Builder
@@ -135,25 +135,25 @@ const Navigation = () => {
               </Link>
             )}
             <Link
-              href="#"
+              href="/templates"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Templates
             </Link>
             <Link
-              href="#"
+              href="/atsScore"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               ATS Score
             </Link>
             <Link
-              href="#"
+              href="/about"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               About
             </Link>
             <Link
-              href="#"
+              href="/contact"
               className="block px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
             >
               Contact
