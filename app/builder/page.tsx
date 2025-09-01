@@ -191,6 +191,17 @@ export default function HomePage() {
             </div>
           )}
         </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Button variant="outline" onClick={() => setOverlayMode("edit")}>
+            Live Edit (Full Screen)
+          </Button>
+          <Button
+            className="bg-primary text-primary-foreground hover:opacity-90"
+            onClick={() => setOverlayMode("preview")}
+          >
+            Live Preview (Full Screen)
+          </Button>
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-3">
