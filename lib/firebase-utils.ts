@@ -197,7 +197,10 @@ export const getResumes = async (userId: string) => {
 
 export const getResume = async (userId: string, resumeId: string) => {
   try {
-    const resumeRef = ref(db, `users/${userId}/resumes/${resumeId}`);
+    // Sanitize resumeId to remove invalid Firebase path characters
+    const sanitizedResumeId = resumeId.replace(/[.#$\[\]]/g, '_');
+    
+    const resumeRef = ref(db, `users/${userId}/resumes/${sanitizedResumeId}`);
     const snapshot = await get(resumeRef);
     return snapshot.exists() ? { id: resumeId, ...snapshot.val() } : null;
   } catch (error) {
@@ -208,7 +211,10 @@ export const getResume = async (userId: string, resumeId: string) => {
 
 export const updateResume = async (userId: string, resumeId: string, updates: any) => {
   try {
-    const resumeRef = ref(db, `users/${userId}/resumes/${resumeId}`);
+    // Sanitize resumeId to remove invalid Firebase path characters
+    const sanitizedResumeId = resumeId.replace(/[.#$\[\]]/g, '_');
+    
+    const resumeRef = ref(db, `users/${userId}/resumes/${sanitizedResumeId}`);
     
     // Get existing resume data to ensure we don't lose any fields
     const existingResume = await getResume(userId, resumeId);
@@ -273,7 +279,10 @@ export const updateResume = async (userId: string, resumeId: string, updates: an
 
 export const deleteResume = async (userId: string, resumeId: string) => {
   try {
-    const resumeRef = ref(db, `users/${userId}/resumes/${resumeId}`);
+    // Sanitize resumeId to remove invalid Firebase path characters
+    const sanitizedResumeId = resumeId.replace(/[.#$\[\]]/g, '_');
+    
+    const resumeRef = ref(db, `users/${userId}/resumes/${sanitizedResumeId}`);
     await remove(resumeRef);
     return { success: true };
   } catch (error) {
@@ -353,7 +362,10 @@ export const fetchGitHubProfileName = async (userId: string, resumeId: string) =
   try {
     console.log('fetchGitHubProfileName: Called with userId:', userId, 'resumeId:', resumeId);
     
-    const resumeRef = ref(db, `users/${userId}/resumes/${resumeId}`);
+    // Sanitize resumeId to remove invalid Firebase path characters
+    const sanitizedResumeId = resumeId.replace(/[.#$\[\]]/g, '_');
+    
+    const resumeRef = ref(db, `users/${userId}/resumes/${sanitizedResumeId}`);
     const snapshot = await get(resumeRef);
     
     if (snapshot.exists()) {

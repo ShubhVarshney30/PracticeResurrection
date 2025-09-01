@@ -2,7 +2,14 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { User } from 'next-auth';
+import { User as NextAuthUser } from 'next-auth';
+
+// Extended User interface to ensure it has an id property
+interface User extends NextAuthUser {
+  id?: string;
+  uid?: string;
+  sub?: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -54,8 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut();
   };
 
+  // Ensure user object has id property (might be stored as uid or sub in some providers)
+  const user = session?.user ? {
+    ...session.user,
+    id: session.user.id || session.user.uid || session.user.sub || ''
+  } : null;
+
   const value: AuthContextType = {
-    user: session?.user || null,
+    user,
     loading,
     signIn: handleSignIn,
     signOut: handleSignOut,

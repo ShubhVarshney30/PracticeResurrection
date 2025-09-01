@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useResumeData } from '@/hooks/use-resume-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,17 +10,22 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Edit, Download, ArrowLeft, Calendar, MapPin, Mail, Globe, Github, Linkedin, Twitter } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ResumeDetailCard from '@/components/ResumeDetailCard';
 
 export default function ResumeViewPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const analysisResult = searchParams.get('analysisResult');
   const { data: session } = useSession();
   const { loadResume, loading, error } = useResumeData();
   const [resume, setResume] = useState<any>(null);
 
   useEffect(() => {
     if (id && session?.user?.id) {
-      loadResume(id as string).then((loadedResume) => {
+      // Sanitize the resumeId from URL to match Firebase path requirements
+      const sanitizedResumeId = (id as string).replace(/[.#$\[\]]/g, '_');
+      loadResume(sanitizedResumeId).then((loadedResume) => {
         if (loadedResume) {
           setResume(loadedResume);
         }
@@ -115,8 +120,9 @@ export default function ResumeViewPage() {
 </head>
 <body>
     <div class="header">
-        <div class="name">${resume.name || 'Your Name'}</div>
-        <div class="title">${resume.role || 'Your Title'}</div>
+       <div class="name">${resume.name || '💙 ATS Insights Dashboard ✨'}</div>
+
+ 
         <div class="contact">
             ${resume.location ? `<div>${resume.location}</div>` : ''}
             ${resume.links?.email ? `<div>${resume.links.email}</div>` : ''}
@@ -212,9 +218,8 @@ export default function ResumeViewPage() {
         <CardContent className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">{resume.name || 'Your Name'}</h1>
-            <p className="text-xl text-muted-foreground mb-4">{resume.role || 'Your Title'}</p>
-            
+            <h1 className="text-3xl font-bold mb-2">{resume.name || '💙 ATS Insights Dashboard ✨'}</h1>
+           
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
               {resume.location && (
                 <div className="flex items-center gap-1">
@@ -379,6 +384,20 @@ export default function ResumeViewPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Display ATS Analysis Results if available and needed */}
+      {analysisResult && searchParams.get('showAnalysis') === 'true' && (
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>ATS Analysis Results</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResumeDetailCard analysisResult={analysisResult} title={id as string} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
