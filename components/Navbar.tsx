@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import React from 'react'
-// import SignIn from './SignIn'
-import { auth, db } from "@/lib/firebase";
-import { User, signOut } from 'firebase/auth';
+import { useSession, signOut } from 'next-auth/react';
 
-function Navbar({ user, className }: { user: User | null, className: string }) {
+function Navbar({ user, className }: { user: any, className: string }) {
+    
+    const { data: session } = useSession();
     
     const handleSignOut = async () => {
         try {
-          await signOut(auth);
+          await signOut();
         } catch (error) {
           console.error("Error signing out: ", error);
         }
@@ -36,9 +36,9 @@ function Navbar({ user, className }: { user: User | null, className: string }) {
     </div>
     <div className="flex space-x-4 items-center">
 
-    {user ? (
+    {session?.user ? (
       <div className="flex items-center space-x-4">
-        <p className="text-gray-400">Welcome, {user.email}</p>
+        <p className="text-gray-400">Welcome, {session.user.email}</p>
         <button 
           onClick={handleSignOut} 
           className="bg-red-500 text-white px-4 py-1 text-sm rounded-md hover:bg-red-600 cursor-pointer"
@@ -47,7 +47,9 @@ function Navbar({ user, className }: { user: User | null, className: string }) {
         </button>
       </div>
     ) : (
-      // <SignIn />
+      <Link href="/auth/signin" className="bg-blue-500 text-white px-4 py-1 text-sm rounded-md hover:bg-blue-600 cursor-pointer">
+        Sign In
+      </Link>
     )}
     </div>
 
