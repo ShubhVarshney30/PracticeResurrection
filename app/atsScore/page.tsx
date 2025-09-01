@@ -342,24 +342,24 @@ export default function Home()  {
                <div className="p-6 w-full lg:w-1/2">
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="company-name" className="block text-sm font-medium text-gray-300 mb-2">Company Name</label>
+                  <label htmlFor="company-name" className="block text-sm font-medium text-gray-800 mb-2">Company Name</label>
                   <input 
                     type="text" 
                     id="company-name"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-700 border-gray-600 border rounded-lg pt-3 pr-4 pb-3 pl-4 text-white"
+                    className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white border-gray-600 border rounded-lg pt-3 pr-4 pb-3 pl-4 text-gray-700"
                     placeholder="Enter company name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="company-job-title" className="block text-sm font-medium text-gray-300 mb-2">Job Title</label>
+                  <label htmlFor="company-job-title" className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
                   <input 
                     type="text" 
                     id="company-job-title"
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
-                    className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-700 border-gray-600 border rounded-lg pt-3 pr-4 pb-3 pl-4 text-white"
+                    className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-zinc-100 border-gray-600 border rounded-lg pt-3 pr-4 pb-3 pl-4 text-gray-700"
                     placeholder="Enter Job Title (e.g., Software Engineer, Data Analyst)"
                   />
                 </div>
@@ -368,13 +368,13 @@ export default function Home()  {
             
             {/* Job Description Upload Section */}
             <div className="p-6 w-full lg:w-1/2">
-              <h2 className="block text-sm font-medium text-gray-300 mb-2">Job Description Upload</h2>
+              <h2 className="block text-sm font-medium text-gray-700 mb-2">Job Description Upload</h2>
               <div className="flex flex-col items-center justify-center w-full">
                 <label htmlFor="job-description-upload" className="w-full">
                 </label>
                   <textarea 
                     id="job-description-upload" 
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-white" 
+                    className="w-full px-4 py-3 bg-zinc-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-gray-700" 
                     placeholder="Enter job description here... (Max 5000 characters)" 
                     maxLength={5000}
                     value={jobDescription}
@@ -387,11 +387,11 @@ export default function Home()  {
 
                          {/* Resume Upload Section */}
              <div className="p-6 animate-slide-in-up delay-500">
-                 <h2 className="block text-sm font-medium text-gray-300 mb-4">Resume Upload</h2>
+                 <h2 className="block text-sm font-medium text-gray-700 mb-4">Resume Upload</h2>
                  
                                    {/* Temporary notice about PDF processing */}
-                  <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
-                    <p className="text-yellow-300 text-sm">
+                  <div className="mb-4 p-3 bg-white border border-yellow-600/30 rounded-lg">
+                    <p className="text-gray-700 text-sm">
                       <strong>Note:</strong> PDF preview is temporarily using placeholder images due to compatibility issues. 
                       Resume analysis functionality remains fully operational.
                     </p>

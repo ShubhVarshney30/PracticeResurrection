@@ -392,7 +392,7 @@ export default function ResumeViewPage() {
             <CardHeader>
               <CardTitle>ATS Analysis Results</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className='bg-white'>
               <ResumeDetailCard analysisResult={analysisResult} title={id as string} />
             </CardContent>
           </Card>

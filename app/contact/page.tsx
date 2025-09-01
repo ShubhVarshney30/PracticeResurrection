@@ -12,10 +12,10 @@ export default function ContactPage() {
   return (
     <div className="min-h-dvh bg-background text-foreground mt-16">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+      <section className="bg-gradient-to-r from-white-500 via-pink-200 to-pink-500 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Get in Touch</h1>
-          <p className="mt-2 text-white/90">Have questions? We’re here to help you succeed.</p>
+          <h1 className="text-3xl text-gray-700 md:text-4xl font-bold tracking-tight">Get in Touch</h1>
+          <p className="mt-2 text-gray-700">Have questions? We’re here to help you succeed.</p>
         </div>
       </section>
 

@@ -27,6 +27,15 @@ const nextConfig = {
     
     return config;
   },
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "webworker-threads": false,
+    };
+    return config;
+  },
 }
+
+
 
 export default nextConfig
