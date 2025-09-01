@@ -21,36 +21,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status !== 'loading') {
       setLoading(false);
-    }
-  }, [status]);
-
-  // Save user data to Firebase after successful authentication
-  useEffect(() => {
-    if (session?.user && !loading) {
-      saveUserToFirebase();
-    }
-  }, [session, loading]);
-
-  const saveUserToFirebase = async () => {
-    if (!session?.user) return;
-
-    try {
-      const response = await fetch('/api/user/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        console.log('User data saved to Firebase successfully');
-      } else {
-        console.error('Failed to save user data to Firebase');
+      
+      // Save user data to Firebase when session is available
+      if (session?.user) {
+        const saveUserToFirebase = async () => {
+          try {
+            const response = await fetch('/api/user/save', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+            
+            if (!response.ok) {
+              console.error('Failed to save user data to Firebase');
+            }
+          } catch (error) {
+            console.error('Error saving user to Firebase:', error);
+          }
+        };
+        
+        saveUserToFirebase();
       }
-    } catch (error) {
-      console.error('Error saving user data to Firebase:', error);
     }
-  };
+  }, [status, session])
 
   const handleSignIn = () => {
     signIn('google');
@@ -71,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      
     </AuthContext.Provider>
   );
 }

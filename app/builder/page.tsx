@@ -3,11 +3,15 @@
 import type React from "react"
 
 import { useState, useMemo, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ResumeManager } from "@/components/ResumeManager"
+import { AutoSave } from "@/components/AutoSave"
+import { useResumeData, ResumeData } from "@/hooks/use-resume-data"
 
 type Experience = {
   id: string
@@ -53,29 +57,7 @@ type GitHubRepo = {
   html_url: string
 }
 
-type PortfolioState = {
-  githubUrl: string
-  selectedRepos: string[]
-  experience: Experience[]
-  education: Education[]
-  template: "modern" | "creative" | "corporate" | "developer"
-  colorScheme: "default" | "green" | "gray"
-  name?: string
-  role?: string
-  location?: string
-  bio?: string
-  links: {
-    linkedin?: string
-    twitter?: string
-    website?: string
-    email?: string
-  }
-  githubProfile?: GitHubProfile
-  repos: GitHubRepo[]
-  summaries?: Record<string, string[]>
-  seoTitle?: string
-  seoDescription?: string
-}
+type PortfolioState = ResumeData
 
 const steps = [
   { id: 1, title: "GitHub" },
@@ -87,9 +69,12 @@ const steps = [
 ] as const
 
 export default function HomePage() {
+  const { data: session } = useSession()
   const [current, setCurrent] = useState<number>(1)
   const [state, setState] = useState<PortfolioState>({
+    title: "New Resume",
     githubUrl: "",
+    githubId: "", // Initialize GitHub ID field
     selectedRepos: [],
     experience: [],
     education: [],
@@ -98,8 +83,7 @@ export default function HomePage() {
     links: {},
     repos: [],
     summaries: {},
-    seoTitle: "",
-    seoDescription: "",
+    noexperienced: false, // Initialize no experience flag
   })
   const [overlayMode, setOverlayMode] = useState<null | "edit" | "preview">(null)
 
@@ -123,16 +107,33 @@ export default function HomePage() {
       if (!res.ok) {
         return { ok: false, error: data?.error || "Failed to fetch GitHub data" }
       }
-      setState((s) => ({
-        ...s,
-        githubProfile: data.profile,
-        repos: data.repos ?? [],
-        name: s.name || data.profile?.name || s.name,
-        bio: s.bio || data.profile?.bio || s.bio,
-        location: s.location || data.profile?.location || s.location,
-      }))
+      
+      // Log the GitHub data received
+      console.log("fetchGitHub: Received profile data:", data.profile)
+      console.log("fetchGitHub: Received repos count:", data.repos?.length)
+      
+      // Extract the GitHub username (login) from the profile data
+      const githubId = data.profile?.login || ""
+      console.log("fetchGitHub: GitHub ID (username):", githubId)
+      
+      setState((s) => {
+        const updatedState = {
+          ...s,
+          githubUrl: profileUrl, // Ensure the URL is saved
+          githubId: githubId, // Store GitHub ID (username) explicitly
+          githubProfile: data.profile,
+          repos: data.repos ?? [],
+          name: s.name || data.profile?.name || s.name,
+          bio: s.bio || data.profile?.bio || s.bio,
+          location: s.location || data.profile?.location || s.location,
+        }
+        console.log("fetchGitHub: Updated state:", updatedState)
+        console.log("fetchGitHub: GitHub ID saved:", updatedState.githubId)
+        return updatedState
+      })
       return { ok: true }
     } catch (e: any) {
+      console.error("fetchGitHub error:", e)
       return { ok: false, error: e?.message || "Network error" }
     }
   }
@@ -155,61 +156,51 @@ export default function HomePage() {
     }
   }
 
+  // Load resume data when user is authenticated
+  const { loadResume } = useResumeData()
+
+  const handleLoadResume = (resume: ResumeData) => {
+    setState(resume)
+  }
+
+  // Load resume from URL parameter
   useEffect(() => {
-    const savedState = localStorage.getItem("portfolioState")
-    if (savedState) {
-      setState(JSON.parse(savedState))
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeId = urlParams.get('resume');
+    
+    if (resumeId && session?.user?.id) {
+      loadResume(resumeId).then((loadedResume) => {
+        if (loadedResume) {
+          setState(loadedResume);
+        }
+      });
     }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("portfolioState", JSON.stringify(state))
-  }, [state])
-
-  useEffect(() => {
-    try {
-      const rawExp = localStorage.getItem("portfolio_experience")
-      const rawEdu = localStorage.getItem("portfolio_education")
-      setState((s) => ({
-        ...s,
-        experience: s.experience.length === 0 && rawExp ? (JSON.parse(rawExp) as Experience[]) : s.experience,
-        education: s.education.length === 0 && rawEdu ? (JSON.parse(rawEdu) as Education[]) : s.education,
-      }))
-    } catch {
-      // ignore parse errors
-    }
-  }, [])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("portfolio_experience", JSON.stringify(state.experience))
-    } catch {}
-  }, [state.experience])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("portfolio_education", JSON.stringify(state.education))
-    } catch {}
-  }, [state.education])
+  }, [session?.user?.id, loadResume]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <header className="mb-6">
+        <div className="flex items-center justify-between">
+          <div>
         <h1 className="text-pretty text-2xl font-semibold text-foreground">Portfolio Generator</h1>
         <p className="text-muted-foreground">Create a professional portfolio from your GitHub and experience.</p>
-        <div className="mt-3 flex items-center gap-2">
-          <Button variant="outline" onClick={() => setOverlayMode("edit")}>
-            Live Edit (Full Screen)
-          </Button>
-          <Button
-            className="bg-primary text-primary-foreground hover:opacity-90"
-            onClick={() => setOverlayMode("preview")}
-          >
-            Live Preview (Full Screen)
-          </Button>
+          </div>
+          {session && (
+            <div className="flex items-center gap-2">
+              <AutoSave resumeData={state} enabled={!!session} />
+            </div>
+          )}
         </div>
       </header>
 
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left: Resume Manager */}
+        <section aria-label="Resume Manager" className="lg:col-span-1">
+          <ResumeManager onLoadResume={handleLoadResume} currentResume={state} />
+        </section>
+
+        {/* Center: Wizard */}
+        <section aria-label="Wizard" className="lg:col-span-2 space-y-4">
       <div className="mb-4 h-2 w-full rounded-full bg-muted">
         <div
           className="h-2 rounded-full bg-primary transition-all"
@@ -221,9 +212,6 @@ export default function HomePage() {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Left: Wizard */}
-        <section aria-label="Wizard" className="space-y-4">
           <StepNav current={current} onStepChange={setCurrent} />
           <Card>
             <CardHeader>
@@ -254,13 +242,22 @@ export default function HomePage() {
               )}
 
               {current === 3 && (
-                <ExperienceStep
-                  value={state.experience}
-                  onChange={(experience) => setState((s) => ({ ...s, experience }))}
-                  onPrev={prev}
-                  onNext={next}
-                />
-              )}
+          <ExperienceStep
+            value={state.experience}
+            onChange={(experience) => {
+              console.log('Experience data being updated in state:', experience);
+              setState((s) => {
+                const updatedState = { ...s, experience };
+                console.log('Updated state with new experience data:', updatedState);
+                return updatedState;
+              });
+            }}
+            noexperienced={state.noexperienced}
+            onNoExperiencedChange={(noexperienced) => setState((s) => ({ ...s, noexperienced }))}
+            onPrev={prev}
+            onNext={next}
+          />
+        )}
 
               {current === 4 && (
                 <EducationStep
@@ -285,8 +282,10 @@ export default function HomePage() {
             </CardContent>
           </Card>
         </section>
+      </div>
 
-        {/* Right: Live Preview */}
+      {/* Right: Live Preview - Full width below on smaller screens */}
+      <div className="mt-6">
         <section aria-label="Live Preview">
           <PortfolioPreview state={state} />
         </section>
@@ -639,11 +638,15 @@ function ExperienceStep({
   onChange,
   onPrev,
   onNext,
+  noexperienced,
+  onNoExperiencedChange,
 }: {
   value: Experience[]
   onChange: (exp: Experience[]) => void
   onPrev: () => void
   onNext: () => void
+  noexperienced?: boolean
+  onNoExperiencedChange?: (value: boolean) => void
 }) {
   // Minimal add-one form; advanced features (drag-and-drop, autosave) will come later
   const [draft, setDraft] = useState<Experience>({
@@ -659,12 +662,22 @@ function ExperienceStep({
 
   const addBullet = () => {
     if (!bullet.trim()) return
-    setDraft((d) => ({ ...d, bullets: [...d.bullets, bullet.trim()] }))
+    console.log('Adding bullet to experience:', bullet.trim())
+    const updatedBullets = [...draft.bullets, bullet.trim()]
+    console.log('Updated bullets array:', updatedBullets)
+    setDraft((d) => {
+      const updated = { ...d, bullets: updatedBullets }
+      console.log('Updated draft with new bullet:', updated)
+      return updated
+    })
     setBullet("")
   }
   const addRole = () => {
     if (!draft.title || !draft.company) return
-    onChange([...value, draft])
+    console.log('Adding experience role:', draft)
+    const updatedExperience = [...value, draft]
+    console.log('Updated experience array:', updatedExperience)
+    onChange(updatedExperience)
     setDraft({
       id: crypto.randomUUID(),
       title: "",
@@ -696,34 +709,44 @@ function ExperienceStep({
           placeholder="Job title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          disabled={noexperienced}
         />
         <Input
           placeholder="Company"
           value={draft.company}
           onChange={(e) => setDraft({ ...draft, company: e.target.value })}
+          disabled={noexperienced}
         />
         <Input
           placeholder="Start (e.g., Jan 2022)"
           value={draft.start}
           onChange={(e) => setDraft({ ...draft, start: e.target.value })}
+          disabled={noexperienced}
         />
         <Input
           placeholder="End (e.g., Present)"
           value={draft.end}
           onChange={(e) => setDraft({ ...draft, end: e.target.value })}
+          disabled={noexperienced}
         />
         <Input
           placeholder="Technologies (comma-separated)"
           value={draft.tech}
           onChange={(e) => setDraft({ ...draft, tech: e.target.value })}
           className="md:col-span-2"
+          disabled={noexperienced}
         />
       </div>
 
       <div className="grid gap-2">
         <div className="flex items-center gap-2">
-          <Input placeholder="Add responsibility bullet" value={bullet} onChange={(e) => setBullet(e.target.value)} />
-          <Button type="button" onClick={addBullet}>
+          <Input 
+            placeholder="Add responsibility bullet" 
+            value={bullet} 
+            onChange={(e) => setBullet(e.target.value)} 
+            disabled={noexperienced}
+          />
+          <Button type="button" onClick={addBullet} disabled={noexperienced}>
             Add
           </Button>
         </div>
@@ -736,14 +759,29 @@ function ExperienceStep({
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button variant="outline" onClick={onPrev}>
-          Back
-        </Button>
-        <Button onClick={addRole}>Add position</Button>
-        <Button onClick={onNext} className="bg-primary text-primary-foreground hover:opacity-90">
-          Continue
-        </Button>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="noexperienced"
+            checked={noexperienced}
+            onChange={(e) => onNoExperiencedChange?.(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <label htmlFor="noexperienced" className="text-sm text-muted-foreground">
+            I don't have any work experience
+          </label>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={onPrev}>
+            Back
+          </Button>
+          <Button onClick={addRole} disabled={noexperienced}>Add position</Button>
+          <Button onClick={onNext} className="bg-primary text-primary-foreground hover:opacity-90">
+            Continue
+          </Button>
+        </div>
       </div>
 
       {value.length > 0 && (
