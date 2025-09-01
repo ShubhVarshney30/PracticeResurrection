@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { auth} from '@/lib/firebase'
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { useSession } from 'next-auth/react';
 import ScoreCircle from './Score';
 
 const ResumeDetailCard = ({ analysisResult, title }: { analysisResult: string, title: string }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const { data: session } = useSession();
     const [url, setUrl] = useState<string | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
       setIsMounted(true);
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-      });
-      return () => unsubscribe();
     }, []);
 
-        const storage = getStorage();
-        const storageRef = ref(storage, `resumes/${user?.uid}/${title}.png`);
-
         useEffect(() => {
-            const fetchUrl = async () => {
-            const url = await getDownloadURL(storageRef);
-            setUrl(url);
+            if (session?.user?.id && title) {
+                const storage = getStorage();
+                const storageRef = ref(storage, `resumes/${session.user.id}/${title}.png`);
+                
+                const fetchUrl = async () => {
+                    try {
+                        const url = await getDownloadURL(storageRef);
+                        setUrl(url);
+                    } catch (error) {
+                        console.error('Error fetching resume image:', error);
+                    }
+                }
+                fetchUrl();
             }
-            fetchUrl();
-        }, [storageRef]);
+        }, [session?.user?.id, title]);
     const { overallScore, keywordAnalysis, experienceQualificationMatch, atsCompatibility,  detailedSuggestions } = JSON.parse(analysisResult);
 
   return (

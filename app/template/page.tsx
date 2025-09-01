@@ -1,8 +1,10 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { AnimatePresence, motion } from "framer-motion"
+import { useSession } from "next-auth/react"
+import { useResumeData } from "@/hooks/use-resume-data"
 
 import resumeData from "./data/resumeData.json"
 import { Button } from "@/components/ui/button"
@@ -13,11 +15,58 @@ import TemplateGallery from "@/components/TemplateGallery"
 import ResumePreview from "@/components/ResumePre"
 
 export default function Page() {
+  const { data: session, status } = useSession()
+  const { resumes, loading, saveResume } = useResumeData()
   const [showGallery, setShowGallery] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState("template1")
   const [fontClass, setFontClass] = useState("font-sans")
+  const [userResume, setUserResume] = useState(resumeData)
   const previewRef = useRef<HTMLDivElement | null>(null)
   const { theme, setTheme } = useTheme()
+
+  // Use the first resume from user's data if available
+  useEffect(() => {
+    if (resumes && resumes.length > 0) {
+      // Transform the resume data to match the template format
+      const firstResume = resumes[0]
+      // Log the resume data to debug
+      console.log('Template page: First resume data:', firstResume)
+      console.log('Template page: Session user:', session?.user)
+      console.log('Template page: GitHub ID:', firstResume.githubId)
+      
+      // Save the name to the resume data if it's not already there
+      if (!firstResume.name && (firstResume.githubId || session?.user?.name)) {
+        const resumeWithName = {
+          ...firstResume,
+          name: firstResume.githubId || session?.user?.name
+        };
+        console.log('Template page: Saving resume with name:', resumeWithName.name);
+        // Update the resume with the name field
+        saveResume(resumeWithName);
+      }
+      
+      const formattedResume = {
+        // Use name from resume if available, otherwise use GitHub ID or session user name
+        name: firstResume.name || firstResume.githubId || session?.user?.name || "John Doe",
+        // Use GitHub ID as part of the title
+        title: firstResume.githubId ? `${firstResume.role || "Software Engineer"} (GitHub: ${firstResume.githubId})` : (firstResume.role || "Software Engineer"),
+        summary: firstResume.bio || "Passionate software engineer with experience building high-quality web applications and scalable systems.",
+        experience: firstResume.experience?.map(exp => ({
+          company: exp.company,
+          role: exp.title,
+          years: `${exp.start}-${exp.end}`,
+          description: exp.bullets?.join(" ") || exp.tech
+        })) || [],
+        education: firstResume.education?.map(edu => ({
+          degree: edu.degree,
+          college: edu.institution,
+          year: edu.year
+        })) || [],
+        skills: firstResume.skills || ["Java", "React", "SQL", "Node.js", "Tailwind CSS"]
+      }
+      setUserResume(formattedResume)
+    }
+  }, [resumes])
 
   const templates = useMemo(
     () => [
@@ -142,7 +191,7 @@ export default function Page() {
                   templates={templates}
                   selectedTemplate={selectedTemplate}
                   onSelect={handleSelectTemplate}
-                  resume={resumeData as any}
+                  resume={userResume as any}
                 />
               </div>
             </CardContent>
@@ -165,7 +214,7 @@ export default function Page() {
                 >
                   <ResumePreview
                     ref={previewRef}
-                    resume={resumeData as any}
+                    resume={userResume as any}
                     templateKey={selectedTemplate}
                     fontClass={fontClass}
                   />

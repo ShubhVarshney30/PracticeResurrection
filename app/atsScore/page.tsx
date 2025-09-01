@@ -4,16 +4,14 @@ import Link from "next/link";
 import ResumeCard from "@/components/ResumeCard";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged, User, signOut } from "firebase/auth";
+import { useSession } from 'next-auth/react';
 // import SignIn from "@/components/SignIn";
 import { useRef } from "react";
 import { generateATSResults, generateCoverLetter } from "@/lib/actions";
-import getResumeImage from '@/lib/util'
+import { getResumeImage } from '@/lib/pdf-utils'
 import { getStorage, ref, uploadBytes, listAll, getBlob, StorageReference, getDownloadURL } from "firebase/storage";
-import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
+import { createResume, getResumes, updateResume } from "@/lib/firebase-utils";
 // import Navbar from "@/components/Navbar";
-
 
 interface UploadedResume {
   id: string;
@@ -26,10 +24,10 @@ interface UploadedResume {
 }
 
 export default function Home()  {
+  const { data: session } = useSession();
  
   const [jobDescription, setJobDescription] = useState('')
   const [resume, setResume] = useState<File | null>(null)
-  const [user, setUser] = useState<User | null>(null);
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [selectedResume, setSelectedResume] = useState<string | null>(null);
@@ -49,51 +47,48 @@ export default function Home()  {
 
   useEffect(() => {
     setIsMounted(true);
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (session?.user?.id) {
       const fetchResumes = async () => {
         setIsResumesLoading(true);
         try {
           const storage = getStorage();
-          const q = query(collection(db, "resumes"), where("uid", "==", user.uid));
-          const querySnapshot = await getDocs(q);
-          const resumesData = querySnapshot.docs.map(docSnap => {
-            const data = docSnap.data();
+          const resumesData = await getResumes(session.user.id);
+          
+          const processedResumes = resumesData.map(resume => {
             let score = 0;
             try {
-              if (data.analysisResult) {
-                const analysis = JSON.parse(data.analysisResult);
+              if (resume.analysisResult) {
+                const analysis = JSON.parse(resume.analysisResult);
                 score = analysis.overallScore || 0;
               }
             } catch (e) {
-              console.error("Failed to parse analysisResult:", data.analysisResult, e);
+              console.error("Failed to parse analysisResult:", resume.analysisResult, e);
             }
+            
             return {
-              id: docSnap.id,
-              name: data.resumeName,
-              jobTitle: data.jobTitle,
+              id: resume.id,
+              name: resume.resumeName || resume.title || 'Untitled Resume',
+              jobTitle: resume.jobTitle || '',
               atsScore: score,
-              storageRef: ref(storage, `resumes/${user.uid}/${data.resumeName}`),
-              analysisResult: data.analysisResult,
-              createdAt: data.createdAt.toDate().toLocaleDateString()
+                             storageRef: ref(storage, `resumes/${session.user.id}/${resume.resumeName || resume.title}`),
+              analysisResult: resume.analysisResult,
+              createdAt: resume.createdAt ? new Date(resume.createdAt).toLocaleDateString() : 'Unknown'
             };
           });
-          setUploadedResumes(resumesData);
+          
+          setUploadedResumes(processedResumes);
         } catch (error) {
           console.error("Error fetching resumes: ", error);
         } finally {
           setIsResumesLoading(false);
         }
-      };
-      fetchResumes();
-    }
-  }, [user?.uid]);
+           };
+     fetchResumes();
+   }
+ }, [session?.user?.id]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -113,6 +108,35 @@ export default function Home()  {
     }
   };
 
+  const testDatabaseConnection = async () => {
+    if (!session?.user?.id) {
+      alert("Please sign in first");
+      return;
+    }
+    
+    try {
+      const testData = {
+        uid: session.user.id,
+        testField: "Database connection test",
+        timestamp: new Date().toISOString(),
+      };
+      
+      const result = await createResume(session.user.id, testData);
+      
+      if (result.success) {
+        alert(`Database connection successful! Test record created with ID: ${result.resumeId}`);
+        // Refresh the resumes list
+        const resumes = await getResumes(session.user.id);
+        console.log('Current resumes in database:', resumes);
+      } else {
+        alert(`Database connection failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Database test error:", error);
+      alert(`Database test failed: ${error}`);
+    }
+  };
+
   const handleSelectUploadedResume = async (resumeRef: StorageReference) => {
     try {
       const blob = await getBlob(resumeRef);
@@ -120,36 +144,72 @@ export default function Home()  {
       setResume(file);
     } catch (error) {
       console.error("Error downloading resume: ", error);
-      alert("There was an error selecting the resume. Please try again.");
+      alert("There was an error selecting the resume. The file may not be available in storage.");
     }
   };
 
   const showResume = async (resumeRef: string) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `resumes/${user?.uid}/${resumeRef}.png`);
-    const url = await getDownloadURL(storageRef);
-    setPreviewResumeImage(url);
-    setIsModalOpen(true);
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `resumes/${session?.user?.id}/${resumeRef}.png`);
+      const url = await getDownloadURL(storageRef);
+      setPreviewResumeImage(url);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error loading resume preview:", error);
+      alert("Could not load resume preview. The image may not be available yet.");
+    }
   };
 
   const handleCoverLetter = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !resume) {
+    if (!session?.user?.id || !resume) {
       alert("Please make sure you are logged in and have selected a resume.");
       return;
     }
     setIsLoading(true);
-    const result = await generateCoverLetter(resume, jobDescription, companyName, jobTitle);
-    setCoverLetter(result);
-    console.log(result);
-    if (result.length > 0) {
-      const cleaned = result.replace(/```json\n|```/g, '').trim();
+    
+    try {
+      const result = await generateCoverLetter(resume, jobDescription, companyName, jobTitle);
+      setCoverLetter(result);
+      console.log(result);
+      
+      if (result.length > 0) {
+        const cleaned = result.replace(/```json\n|```/g, '').trim();
+        
+                 // Save cover letter data to Realtime Database
+         const coverLetterData = {
+           uid: session.user.id,
+           resumeName: resume.name,
+           jobTitle: jobTitle,
+           companyName: companyName,
+           jobDescription: jobDescription,
+           coverLetter: cleaned,
+           fileName: resume.name,
+           fileSize: resume.size,
+           fileType: resume.type,
+           createdAt: new Date().toISOString(),
+         };
+         
+         const createResult = await createResume(session.user.id, coverLetterData);
+        
+        if (createResult.success) {
+          console.log('Cover letter saved to Realtime Database with ID:', createResult.resumeId);
+        } else {
+          console.error('Failed to save cover letter to database:', createResult.error);
+        }
+        
+        setIsLoading(false);
+        return cleaned;
+      } else {
+        alert("There was an error processing your resume. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error generating cover letter:", error);
+      alert("There was an error generating the cover letter. Please try again.");
+    } finally {
       setIsLoading(false);
-      return cleaned;
-    } else {
-      alert("There was an error processing your resume. Please try again.");
     }
-    setIsLoading(false);
   };
 
 
@@ -168,6 +228,7 @@ export default function Home()  {
     setIsLoading(true);
 
     try {
+        // Create a placeholder image for now (PDF processing is temporarily disabled)
         const imageBlob = await getResumeImage(resume);
         
         // Convert blob to data URL for display first
@@ -181,29 +242,42 @@ export default function Home()  {
         if (result.length > 0) {
           const cleaned = result.replace(/```json\n|```/g, '').trim();
           
-          // Add document to Firestore AFTER getting the result
-          const resumeCollectionRef = collection(db, "resumes");
-          await addDoc(resumeCollectionRef, { 
-            uid: user.uid,
-            resumeName: resume.name,
-            jobTitle: jobTitle,
-            analysisResult: cleaned,
-            createdAt: new Date(),
-          });
+                     // Save resume data to Firebase Realtime Database
+           const resumeData = {
+             uid: session.user.id,
+             resumeName: resume.name,
+             jobTitle: jobTitle,
+             companyName: companyName,
+             jobDescription: jobDescription,
+             analysisResult: cleaned,
+             fileName: resume.name,
+             fileSize: resume.size,
+             fileType: resume.type,
+             createdAt: new Date().toISOString(),
+           };
+           
+           const createResult = await createResume(session.user.id, resumeData);
           
-          // Upload files to Firebase Storage
-          const storage = getStorage();
-          const storageRef = ref(storage, `resumes/${resume.name}.png`);
-          const resumeRef = ref(storage, `resumes/${resume.name}`);
-          
-          uploadBytes(storageRef, imageBlob).then((snapshot) => {
-              console.log('Uploaded a blob image!');
-          });
-          uploadBytes(resumeRef, resume).then((snapshot) => {
-              console.log('Uploaded a resume file!');
-          });
-          
-          router.push(`/resumes/${resume.name}?analysisResult=${encodeURIComponent(cleaned)}`);
+          if (createResult.success) {
+            console.log('Resume saved to Realtime Database with ID:', createResult.resumeId);
+            
+                         // Upload files to Firebase Storage
+             const storage = getStorage();
+             const storageRef = ref(storage, `resumes/${session.user.id}/${resume.name}.png`);
+             const resumeRef = ref(storage, `resumes/${session.user.id}/${resume.name}`);
+            
+            uploadBytes(storageRef, imageBlob).then((snapshot) => {
+                console.log('Uploaded resume preview image!');
+            });
+            uploadBytes(resumeRef, resume).then((snapshot) => {
+                console.log('Uploaded original resume file!');
+            });
+            
+            router.push(`/resumes/${resume.name}?analysisResult=${encodeURIComponent(cleaned)}`);
+          } else {
+            console.error('Failed to save resume to database:', createResult.error);
+            alert("Resume analysis completed but failed to save to database. Please try again.");
+          }
         } else {
           alert("There was an error processing your resume. Please try again.");
         }
@@ -281,10 +355,29 @@ export default function Home()  {
             </div>
 
 
-            {/* Resume Upload Section */}
-            <div className="p-6 animate-slide-in-up delay-500">
-                <h2 className="block text-sm font-medium text-gray-300 mb-4">Resume Upload</h2>
-                <div className="flex flex-col sm:flex-row gap-4">
+                         {/* Resume Upload Section */}
+             <div className="p-6 animate-slide-in-up delay-500">
+                 <h2 className="block text-sm font-medium text-gray-300 mb-4">Resume Upload</h2>
+                 
+                                   {/* Temporary notice about PDF processing */}
+                  <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                    <p className="text-yellow-300 text-sm">
+                      <strong>Note:</strong> PDF preview is temporarily using placeholder images due to compatibility issues. 
+                      Resume analysis functionality remains fully operational.
+                    </p>
+                  </div>
+                  
+                  {/* Database test button */}
+                  <div className="mb-4">
+                    <button 
+                      onClick={testDatabaseConnection}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-all duration-200"
+                    >
+                      Test Database Connection
+                    </button>
+                  </div>
+                 
+                 <div className="flex flex-col sm:flex-row gap-4">
 
 
                   <div className="flex w-full">
