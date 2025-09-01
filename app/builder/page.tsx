@@ -190,7 +190,7 @@ export default function HomePage() {
   }, [state.education])
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 mt-16">
+    <main className="mx-auto max-w-6xl px-4 py-8 mt-16 bg-gradient-to-b from-blue-50 to-blue-200">
       <header className="mb-6">
         <h1 className="text-pretty text-2xl font-semibold text-foreground">Portfolio Generator</h1>
         <p className="text-muted-foreground">Create a professional portfolio from your GitHub and experience.</p>

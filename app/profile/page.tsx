@@ -1,16 +1,16 @@
 'use client';
 
-import { useAuth } from '../../components/auth-provider';
-import { ProtectedRoute } from '../../components/protected-route';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
+import { useAuth } from '@/components/auth-provider';
+import { ProtectedRoute } from '@/components/protected-route';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { User, Mail, Calendar, Edit, Save, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { updateUser, getUser } from '../../lib/firebase-utils';
-import { useToast } from '../../hooks/use-toast';
+import { updateUser, getUser } from '@/lib/firebase-utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
   const { user } = useAuth();

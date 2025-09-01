@@ -81,7 +81,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground mt-16">
+    <div className="min-h-dvh bg-background text-foreground mt-16 bg-gradient-to-b from-blue-50 to-blue-200">
       <header className="border-b bg-background">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-balance">

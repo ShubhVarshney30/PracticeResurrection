@@ -16,11 +16,11 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0 cursor-pointer">
             <h1 className="text-2xl font-bold gradient-text">
               Resume Builder
             </h1>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
@@ -86,13 +86,15 @@ const Navigation = () => {
             ) : (
               <>
                 <Link href="/auth/signin">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" style={{ cursor:"pointer"}} size="sm">
                     Sign In
                   </Button>
                 </Link>
-                <Button size="sm">
+                <Link href="/builder">
+                <Button style={{ cursor:"pointer"}} size="sm">
                   Start Building
                 </Button>
+                </Link>
               </>
             )}
           </div>
