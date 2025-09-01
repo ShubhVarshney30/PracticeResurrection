@@ -14,7 +14,6 @@ import { getStorage, ref, uploadBytes, listAll, getBlob, StorageReference, getDo
 import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 // import Navbar from "@/components/Navbar";
 
-
 interface UploadedResume {
   id: string;
   name: string;
@@ -193,13 +192,13 @@ export default function Home()  {
           
           // Upload files to Firebase Storage
           const storage = getStorage();
-          const storageRef = ref(storage, `resumes/${resume.name}.png`);
-          const resumeRef = ref(storage, `resumes/${resume.name}`);
+          const imageStorageRef = ref(storage, `resumes/${user.uid}/${resume.name}.png`);
+          const resumeFileRef = ref(storage, `resumes/${user.uid}/${resume.name}`);
           
-          uploadBytes(storageRef, imageBlob).then((snapshot) => {
+          uploadBytes(imageStorageRef, imageBlob).then((snapshot) => {
               console.log('Uploaded a blob image!');
           });
-          uploadBytes(resumeRef, resume).then((snapshot) => {
+          uploadBytes(resumeFileRef, resume).then((snapshot) => {
               console.log('Uploaded a resume file!');
           });
           

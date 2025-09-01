@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useMemo, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -99,6 +101,7 @@ export default function HomePage() {
     seoTitle: "",
     seoDescription: "",
   })
+  const [overlayMode, setOverlayMode] = useState<null | "edit" | "preview">(null)
 
   const progress = useMemo(() => (current / steps.length) * 100, [current])
 
@@ -190,10 +193,21 @@ export default function HomePage() {
   }, [state.education])
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 mt-16 bg-gradient-to-b from-blue-50 to-blue-200">
+    <main className="mx-auto max-w-6xl px-4 py-8">
       <header className="mb-6">
         <h1 className="text-pretty text-2xl font-semibold text-foreground">Portfolio Generator</h1>
         <p className="text-muted-foreground">Create a professional portfolio from your GitHub and experience.</p>
+        <div className="mt-3 flex items-center gap-2">
+          <Button variant="outline" onClick={() => setOverlayMode("edit")}>
+            Live Edit (Full Screen)
+          </Button>
+          <Button
+            className="bg-primary text-primary-foreground hover:opacity-90"
+            onClick={() => setOverlayMode("preview")}
+          >
+            Live Preview (Full Screen)
+          </Button>
+        </div>
       </header>
 
       <div className="mb-4 h-2 w-full rounded-full bg-muted">
@@ -277,6 +291,26 @@ export default function HomePage() {
           <PortfolioPreview state={state} />
         </section>
       </div>
+
+      {overlayMode && (
+        <FullscreenOverlay
+          title={overlayMode === "edit" ? "Live Edit" : "Live Preview"}
+          onClose={() => setOverlayMode(null)}
+        >
+          {overlayMode === "edit" ? (
+            <LiveEditResume state={state} onChange={setState} onDone={() => setOverlayMode(null)} />
+          ) : (
+            <div className="mx-auto h-full w-full max-w-4xl overflow-auto p-6">
+              <PortfolioPreview state={state} />
+              <div className="mt-4 flex justify-end">
+                <Button variant="outline" onClick={() => setOverlayMode(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </FullscreenOverlay>
+      )}
     </main>
   )
 }
@@ -1379,5 +1413,337 @@ function PortfolioPreview({ state }: { state: PortfolioState }) {
         )}
       </CardContent>
     </Card>
+  )
+}
+
+function FullscreenOverlay({
+  title,
+  onClose,
+  children,
+}: {
+  title: string
+  onClose: () => void
+  children: React.ReactNode
+}) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [onClose])
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      className="fixed inset-0 z-50 flex h-full w-full flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+    >
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <p className="text-pretty text-lg font-semibold">{title}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Press Esc to close</span>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto">{children}</div>
+    </div>
+  )
+}
+
+function EditableInline({
+  value,
+  onChange,
+  className,
+  ariaLabel,
+  multiline = false,
+}: {
+  value?: string
+  onChange: (v: string) => void
+  className?: string
+  ariaLabel: string
+  multiline?: boolean
+}) {
+  function handleInput(e: React.FormEvent<HTMLElement>) {
+    const txt = (e.currentTarget as HTMLElement).innerText
+    onChange(txt)
+  }
+  const Comp: any = multiline ? "div" : "span"
+  return (
+    <Comp
+      role="textbox"
+      aria-label={ariaLabel}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={handleInput}
+      className={cn(
+        "outline-none ring-0 focus:outline-none focus:ring-2 focus:ring-primary/40",
+        multiline && "whitespace-pre-wrap",
+        className,
+      )}
+    >
+      {value || ""}
+    </Comp>
+  )
+}
+
+function LiveEditResume({
+  state,
+  onChange,
+  onDone,
+}: {
+  state: PortfolioState
+  onChange: React.Dispatch<React.SetStateAction<PortfolioState>>
+  onDone: () => void
+}) {
+  // helpers to update nested arrays immutably
+  const updateExperience = (id: string, patch: Partial<Experience>) => {
+    onChange((s) => ({
+      ...s,
+      experience: s.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    }))
+  }
+  const updateExperienceBullet = (id: string, index: number, txt: string) => {
+    onChange((s) => ({
+      ...s,
+      experience: s.experience.map((e) =>
+        e.id === id ? { ...e, bullets: e.bullets.map((b, i) => (i === index ? txt : b)) } : e,
+      ),
+    }))
+  }
+  const updateEducation = (id: string, patch: Partial<Education>) => {
+    onChange((s) => ({
+      ...s,
+      education: s.education.map((ed) => (ed.id === id ? { ...ed, ...patch } : ed)),
+    }))
+  }
+  const updateSummaryBullet = (fullName: string, idx: number, txt: string) => {
+    onChange((s) => {
+      const next = { ...(s.summaries || {}) }
+      const arr = (next[fullName] || []).slice()
+      if (idx < arr.length) arr[idx] = txt
+      next[fullName] = arr
+      return { ...s, summaries: next }
+    })
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-4xl p-6">
+      <header className="mb-6 space-y-2">
+        <EditableInline
+          ariaLabel="Name"
+          value={state.name}
+          onChange={(v) => onChange((s) => ({ ...s, name: v }))}
+          className={cn(
+            "block text-2xl font-semibold",
+            state.colorScheme === "gray" ? "text-foreground" : "text-primary",
+          )}
+        />
+        <EditableInline
+          ariaLabel="Role"
+          value={state.role}
+          onChange={(v) => onChange((s) => ({ ...s, role: v }))}
+          className="block text-sm text-muted-foreground"
+        />
+        <EditableInline
+          ariaLabel="Location"
+          value={state.location}
+          onChange={(v) => onChange((s) => ({ ...s, location: v }))}
+          className="block text-xs text-muted-foreground"
+        />
+
+        <div className="mt-3">
+          <EditableInline
+            ariaLabel="Bio"
+            value={state.bio}
+            multiline
+            onChange={(v) => onChange((s) => ({ ...s, bio: v }))}
+            className={cn(
+              "block text-sm leading-relaxed",
+              state.template === "corporate" && "border-l-2 border-primary/30 pl-3",
+            )}
+          />
+        </div>
+      </header>
+
+      <section className="space-y-3">
+        <h3 className={cn("text-sm font-medium", state.colorScheme === "gray" ? "text-foreground" : "text-primary")}>
+          Projects
+        </h3>
+        {state.selectedRepos.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Select up to 3 repositories to showcase.</p>
+        ) : (
+          <ul className="grid gap-3">
+            {state.selectedRepos.map((full) => {
+              const r = state.repos.find((x) => x.full_name === full)
+              const s = state.summaries?.[full] || []
+              return (
+                <li key={full} className="rounded-md border p-3">
+                  <p className="text-sm font-medium">{r?.name ?? full}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    {r?.language && <span>{r.language}</span>}
+                    {typeof r?.stargazers_count === "number" && <span>★ {r.stargazers_count}</span>}
+                    {typeof r?.forks_count === "number" && <span>⑂ {r.forks_count}</span>}
+                    {r?.updated_at && <span>Updated {new Date(r.updated_at).toLocaleDateString()}</span>}
+                    {r?.html_url && (
+                      <a
+                        href={r.html_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        GitHub
+                      </a>
+                    )}
+                  </div>
+                  <ul className="mt-2 list-disc pl-5 text-xs text-muted-foreground">
+                    {s.length > 0 ? (
+                      s.map((b, i) => (
+                        <li key={i}>
+                          <EditableInline
+                            ariaLabel={`Project bullet ${i + 1}`}
+                            value={b}
+                            onChange={(v) => updateSummaryBullet(full, i, v)}
+                            className="inline"
+                          />
+                        </li>
+                      ))
+                    ) : (
+                      <>
+                        <li className="opacity-70">Primary purpose will be generated</li>
+                        <li className="opacity-70">Key technologies detected</li>
+                        <li className="opacity-70">Notable features/achievements</li>
+                      </>
+                    )}
+                  </ul>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-6 space-y-3">
+        <h3 className={cn("text-sm font-medium", state.colorScheme === "gray" ? "text-foreground" : "text-primary")}>
+          Experience
+        </h3>
+        {state.experience.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Add your positions and responsibilities.</p>
+        ) : (
+          <ul className="space-y-3">
+            {state.experience.map((e) => (
+              <li key={e.id} className="rounded-md border p-3">
+                <p className="text-sm font-medium">
+                  <EditableInline
+                    ariaLabel="Job title"
+                    value={e.title}
+                    onChange={(v) => updateExperience(e.id, { title: v })}
+                    className="mr-1"
+                  />
+                  •
+                  <EditableInline
+                    ariaLabel="Company"
+                    value={e.company}
+                    onChange={(v) => updateExperience(e.id, { company: v })}
+                    className="ml-1"
+                  />
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <EditableInline
+                    ariaLabel="Start date"
+                    value={e.start}
+                    onChange={(v) => updateExperience(e.id, { start: v })}
+                    className="mr-1"
+                  />
+                  -
+                  <EditableInline
+                    ariaLabel="End date"
+                    value={e.end}
+                    onChange={(v) => updateExperience(e.id, { end: v })}
+                    className="ml-1"
+                  />
+                </p>
+                {e.bullets.length > 0 && (
+                  <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
+                    {e.bullets.map((b, i) => (
+                      <li key={i}>
+                        <EditableInline
+                          ariaLabel={`Experience bullet ${i + 1}`}
+                          value={b}
+                          onChange={(v) => updateExperienceBullet(e.id, i, v)}
+                          className="inline"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="mt-1 text-xs">
+                  Tech:&nbsp;
+                  <EditableInline
+                    ariaLabel="Technologies"
+                    value={e.tech}
+                    onChange={(v) => updateExperience(e.id, { tech: v })}
+                    className="inline"
+                  />
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {state.education.length > 0 && (
+        <section className="mt-6 space-y-3">
+          <h3 className={cn("text-sm font-medium", state.colorScheme === "gray" ? "text-foreground" : "text-primary")}>
+            Education
+          </h3>
+          <ul className="space-y-3">
+            {state.education.map((ed) => (
+              <li key={ed.id} className="rounded-md border p-3">
+                <p className="text-sm font-medium">
+                  <EditableInline
+                    ariaLabel="Degree"
+                    value={ed.degree}
+                    onChange={(v) => updateEducation(ed.id, { degree: v })}
+                    className="mr-1"
+                  />
+                  •
+                  <EditableInline
+                    ariaLabel="Institution"
+                    value={ed.institution}
+                    onChange={(v) => updateEducation(ed.id, { institution: v })}
+                    className="ml-1"
+                  />
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <EditableInline
+                    ariaLabel="Field of study"
+                    value={ed.field}
+                    onChange={(v) => updateEducation(ed.id, { field: v })}
+                    className="mr-1"
+                  />
+                  •
+                  <EditableInline
+                    ariaLabel="Graduation year"
+                    value={ed.year}
+                    onChange={(v) => updateEducation(ed.id, { year: v })}
+                    className="ml-1"
+                  />
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="mt-8 flex justify-end">
+        <Button onClick={onDone} className="bg-primary text-primary-foreground hover:opacity-90">
+          Done
+        </Button>
+      </div>
+    </div>
   )
 }
