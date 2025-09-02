@@ -14,8 +14,8 @@ export default function TransformationStory() {
             The Transformation: From Legacy Burden to Modern Momentum
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-            We favored safe, incremental steps over risky rewrites—tight feedback loops, clear boundaries, and
-            measurable wins at each stage.
+            We prioritized safe, incremental evolution over risky rewrites—establishing tight feedback loops,
+            clear boundaries, and measurable outcomes at every stage.
           </p>
         </header>
 
@@ -45,13 +45,12 @@ export default function TransformationStory() {
             className="flex flex-col gap-4 text-sm leading-6 text-foreground md:text-base md:leading-7"
           >
             <p className="text-pretty">
-              We mapped risk, isolated blast radiuses, and stabilized the build. The first wins were small but
-              compounding: smoke tests on critical flows, typed boundaries around fragile modules, and a thin modern
-              slice to validate patterns without risking revenue.
+              We defined a modern, sustainable stack and phased capabilities over time—pairing a dynamic UI with
+              strong boundaries, type safety, and maintainable workflows to support long‑term velocity.
             </p>
             <p className="text-pretty">
-              Progressive routing and feature flags allowed side-by-side evolution. Each merge shrank the legacy surface
-              area and expanded our confidence—no “big rewrite,” just continuous delivery of value.
+              Progressive routing and feature flags enabled side‑by‑side evolution. Each feature landed behind clear
+              guardrails with an explicit scope for scalability.
             </p>
             <p className="text-pretty">
               As shared components, accessibility checks, and observability grew, velocity followed. We traded fear of
@@ -70,10 +69,11 @@ export default function TransformationStory() {
           >
             <h3 className="text-lg font-medium tracking-tight md:text-xl">Turning Points</h3>
             <ul className="ml-4 list-disc space-y-3">
-              <li>Typed contracts at the legacy/modern seam cut defect rates and clarified ownership.</li>
-              <li>Feature-flagged rollouts enabled safe production trials and faster iteration cycles.</li>
-              <li>A cohesive design system replaced one-off UI, improving UX, accessibility, and DX.</li>
-              <li>Observability transformed unknowns into actionable metrics—no more guessing.</li>
+              <li>Introduced a dynamic dashboard</li>
+              <li>Added an ATS score checker</li>
+              <li>Added an AI‑powered content enhancer</li>
+              <li>Launched professional resume templates</li>
+              <li>Integrated Google authentication and profile</li>
             </ul>
           </motion.article>
 
@@ -95,7 +95,7 @@ export default function TransformationStory() {
           </motion.figure>
         </div>
 
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "0px 0px -80px 0px" }}
@@ -124,7 +124,7 @@ export default function TransformationStory() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Additional visual story frames */}
         <div className="mt-12 grid gap-8 md:grid-cols-3">
@@ -157,7 +157,7 @@ export default function TransformationStory() {
               className="h-auto w-full rounded-md"
             />
             <figcaption className="mt-3 text-xs text-muted-foreground">
-              Feature flags enabled safe trials and seamless rollouts.
+              Feature flags enabled progressive rollout and safe iteration.
             </figcaption>
           </motion.figure>
           <motion.figure

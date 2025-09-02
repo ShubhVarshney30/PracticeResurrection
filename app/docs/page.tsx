@@ -11,17 +11,17 @@ import TransformationDeepDive from "@/components/sections/transformation-deep-di
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-[#0b0f1a] text-white font-sans">
-      <Hero />
+    <main className="min-h-screen bg-background text-foreground font-sans">
+      <Closing />
       <Fall />
       <Rebirth />
       <Modernization />
       <TransformationStory />
       <TransformationDeepDive />
-      <BeforeAfterSection />
+      {/* <BeforeAfterSection /> */}
       <Features />
       <FrontendEvolution />
-      <Closing />
+      
     </main>
   )
 }

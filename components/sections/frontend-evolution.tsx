@@ -11,23 +11,24 @@ export default function FrontendEvolution() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        className="text-2xl md:text-4xl font-semibold mb-6"
+        className="text-2xl md:text-4xl font-semibold mb-6 text-foreground"
       >
         Frontend Evolution
       </motion.h3>
 
-      <p className="text-white/80 leading-relaxed mb-6">
-        From a grayscale, static interface to a fast, colorful React experience.
+      <p className="text-muted-foreground leading-relaxed mb-6">
+        Evolved from a static, grayscale interface to a performant, accessible React experience powered by a cohesive
+        design system and modern tooling.
       </p>
 
       <BeforeAfterSlider
         before={{
-          src: "/2015-static-frontend-ui-grayscale.png",
+          src: "/2015-static-frontend-ui-screenshot-outdated.png",
           alt: "Old 2015 static UI (before)",
           label: "2015 Static UI",
         }}
         after={{
-          src: "/modern-react-ui-colorful-dynamic.png",
+          src: "/modern-design-system-clean-components-fast-builds.png",
           alt: "New React UI (after)",
           label: "2025 React UI",
         }}

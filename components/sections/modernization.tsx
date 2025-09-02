@@ -13,13 +13,15 @@ export default function Modernization() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        className="text-2xl md:text-4xl font-semibold mb-6"
+        className="text-2xl md:text-4xl font-semibold mb-6 text-foreground"
       >
-        From Vanilla JS to Modern Tech
+        From Vanilla JS to a Modern Platform
       </motion.h3>
 
-      <p className="text-white/80 leading-relaxed max-w-3xl">
-        We rebuilt the codebase with a NestJS backend and a modern React frontend—typed, testable, and scalable.
+      <p className="text-muted-foreground leading-relaxed max-w-3xl">
+        We re‑architected the project with a typed React frontend and a modular NestJS backend—improving reliability,
+        testability, and long‑term maintainability. The result is a foundation that scales with features and
+        contributors.
       </p>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -49,9 +51,9 @@ export default function Modernization() {
           endYear={2025}
           milestones={[
             { year: 2015, label: "Launch, vanilla JS" },
-            { year: 2018, label: "Stagnation" },
-            { year: 2021, label: "Community forks" },
-            { year: 2024, label: "Revival plan" },
+            // { year: 2018, label: "Stagnation" },
+            // { year: 2021, label: "Community forks" },
+            // { year: 2024, label: "Revival plan" },
             { year: 2025, label: "Modern release" },
           ]}
         />
@@ -77,20 +79,20 @@ function InfoCard({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="rounded-lg border border-white/10 bg-white/5 p-4"
+      className="rounded-lg border border-border bg-card p-4"
     >
       <div className="flex items-center gap-2">
         {icon}
-        <h4 className="font-medium">{title}</h4>
+        <h4 className="font-medium text-foreground">{title}</h4>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-        <div className="rounded-md bg-white/5 p-2">
-          <p className="text-white/60">Old</p>
-          <p className="text-white/90">{from}</p>
+        <div className="rounded-md bg-background/40 p-2">
+          <p className="text-muted-foreground">Old</p>
+          <p className="text-foreground/90">{from}</p>
         </div>
-        <div className="rounded-md bg-white/10 p-2">
-          <p className="text-white/60">New</p>
-          <p className="text-white/90">{to}</p>
+        <div className="rounded-md bg-background/60 p-2">
+          <p className="text-muted-foreground">New</p>
+          <p className="text-foreground/90">{to}</p>
         </div>
       </div>
     </motion.div>

@@ -16,25 +16,40 @@ export default function Closing() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-2xl md:text-4xl font-semibold mb-4"
+          className="text-2xl md:text-4xl font-semibold mb-4 text-foreground"
         >
-          Not just revived, but reimagined
+          Not just revived—reimagined
         </motion.h3>
-        <p className="text-white/80 leading-relaxed mb-8">
-          A repo reborn with AI, modern frameworks, and endless possibilities.
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          A community favorite rebuilt for the present: modern frameworks, AI‑assisted features, secure auth, and a
+          cohesive design system—designed for long‑term sustainability and growth.
         </p>
-
         <motion.a
-          href="#"
+          href="https://github.com/resume/resume.github.com"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           whileHover={{ boxShadow: "0 0 40px rgba(0,212,255,0.35)", y: -2 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: true }}
-          className="inline-block rounded-full bg-[#00D4FF] px-6 py-3 font-medium text-black"
-          aria-label="Explore the New Repo"
+          className="mr-4 inline-block rounded-full bg-primary text-primary-foreground px-6 py-3 font-medium"
+          aria-label="Explore the legacy repository"
         >
-          Explore the New Repo
+          View Legacy Repo
+        </motion.a>
+        
+
+
+        <motion.a
+          href="https://github.com/urjitupadhya/resume.github.com"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          whileHover={{ boxShadow: "0 0 40px rgba(0,212,255,0.35)", y: -2 }}
+          transition={{ duration: 0.3 }}
+          viewport={{ once: true }}
+          className="ml-4 inline-block rounded-full bg-primary text-primary-foreground px-6 py-3 font-medium"
+          aria-label="Explore the modernized repository"
+        >
+          Explore Modern Repo
         </motion.a>
       </div>
     </section>

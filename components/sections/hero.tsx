@@ -38,9 +38,11 @@ export default function Hero() {
             <Clock className="h-5 w-5" aria-hidden />
             <Cog className="h-5 w-5" aria-hidden />
           </div>
-          <h1 className="text-pretty text-4xl md:text-6xl font-semibold">From Abandonment to Revival</h1>
-          <p className="text-balance text-base md:text-lg text-white/80 leading-relaxed">
-            The story of a repo with 66k+ stars, once legendary but lost to time.
+          <h1 className="text-pretty text-4xl md:text-6xl font-semibold text-foreground">From Abandonment to Revival</h1>
+          <p className="text-balance text-base md:text-lg text-muted-foreground leading-relaxed">
+            An open‑source project with 66k+ stars, revitalized with a modern, typed stack, robust CI/CD, and
+            production‑grade UX. This documentation outlines the journey, the engineering decisions, and the
+            capabilities you can rely on today.
           </p>
         </motion.div>
       </section>

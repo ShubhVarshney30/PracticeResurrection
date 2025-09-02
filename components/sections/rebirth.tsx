@@ -14,19 +14,19 @@ export default function Rebirth() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-2xl md:text-4xl font-semibold"
+            className="text-2xl md:text-4xl font-semibold text-foreground"
           >
-            Taking responsibility to revive
+            Community‑led revival
           </motion.h3>
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-white/80 leading-relaxed"
+            className="text-muted-foreground leading-relaxed"
           >
-            Our team stepped in to preserve the core idea and rebuild it with a modern foundation—built for the
-            community, by the community.
+            We preserved the original vision and rebuilt on a modern foundation—prioritizing usability, maintainability,
+            and contribution ergonomics. The result is a sustainable project shaped with and for the community.
           </motion.p>
           <div className="flex items-center gap-4 text-[#00FFA3]">
             <Users className="h-5 w-5" aria-hidden />

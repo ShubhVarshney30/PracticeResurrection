@@ -10,9 +10,9 @@ export default function Fall() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true, amount: 0.4 }}
-        className="text-2xl md:text-4xl font-semibold mb-6"
+        className="text-2xl md:text-4xl font-semibold mb-6 text-foreground"
       >
-        Once a star, then forgotten
+        From prominence to stagnation
       </motion.h2>
 
       <motion.p
@@ -20,10 +20,11 @@ export default function Fall() {
         whileInView={{ opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.6 }}
         viewport={{ once: true }}
-        className="text-white/80 leading-relaxed max-w-3xl"
+        className="text-muted-foreground leading-relaxed max-w-3xl"
       >
-        Coded in vanilla JS with a 2015-era frontend, the project gradually lost momentum. Without maintenance, issues
-        piled up and the community drifted away.
+        Originally built with a 2015‑era, vanilla‑JS frontend, the project’s momentum waned over time. Without
+        sustained maintenance, technical debt accumulated, contributor experience declined, and community engagement
+        tapered off.
       </motion.p>
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -33,9 +34,9 @@ export default function Fall() {
           whileInView={{ opacity: 1, filter: "grayscale(0%)" }}
           transition={{ duration: 1.2 }}
           viewport={{ once: true }}
-          className="rounded-lg border border-white/10 bg-white/5 p-4"
+          className="rounded-lg border border-border bg-card p-4"
         >
-          <p className="text-xs text-white/60 mb-2">Old Code (Vanilla JS)</p>
+          <p className="text-xs text-muted-foreground mb-2">Legacy code sample (vanilla JS)</p>
           <pre className="text-sm leading-6 overflow-x-auto">
             {`// 2015-style DOM manipulation
 var btn = document.getElementById('save');
@@ -53,7 +54,7 @@ btn.addEventListener('click', function () {
           whileInView={{ opacity: 1, filter: "grayscale(0%)" }}
           transition={{ duration: 1.2 }}
           viewport={{ once: true }}
-          className="relative rounded-lg overflow-hidden border border-white/10"
+          className="relative rounded-lg overflow-hidden border border-border"
         >
           <img
             src="/2015-static-frontend-ui-screenshot-outdated.png"
