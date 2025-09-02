@@ -10,6 +10,19 @@ export const authOptions = {
   ],
   // Temporarily remove custom adapter to fix loading issue
   // adapter: firebaseAdapter,
+  
+  // Explicitly set cookie options for better cross-environment compatibility
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   callbacks: {
     async session({ session, token }: any) {
       console.log('NextAuth session callback - token:', token);
@@ -46,6 +59,8 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   // Disable debug in production to avoid the warning
   debug: false,
+  // Trust the proxy headers from Vercel
+  trustHost: true,
 };
 
 const handler = NextAuth(authOptions);

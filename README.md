@@ -112,6 +112,27 @@ portfolio-generator/
 ### Theming
 Edit the `tailwind.config.js` file to customize the color scheme and other design tokens.
 
+## 🚀 Deployment to Vercel
+
+This application is optimized for deployment on Vercel. Follow these steps to deploy:
+
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. Create an account on [Vercel](https://vercel.com) if you don't have one
+3. Click **Add New** > **Project** in the Vercel dashboard
+4. Import your Git repository
+5. Configure the following environment variables in the Vercel dashboard:
+   - Firebase configuration
+   - NextAuth configuration
+   - Google OAuth credentials
+   - Any other API keys used in your application
+6. Click **Deploy**
+
+For detailed deployment instructions, refer to the following guides in this repository:
+- [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) - Complete deployment guide
+- [PRODUCTION_AUTH_SETUP.md](PRODUCTION_AUTH_SETUP.md) - Authentication setup for production
+- [FIREBASE_PRODUCTION_SETUP.md](FIREBASE_PRODUCTION_SETUP.md) - Firebase configuration for production
+- [DEPLOYMENT_TESTING_CHECKLIST.md](DEPLOYMENT_TESTING_CHECKLIST.md) - Testing your deployed application
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
