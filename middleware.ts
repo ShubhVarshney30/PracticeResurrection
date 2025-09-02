@@ -5,7 +5,9 @@ const protectedRoutes = ['/dashboard', '/profile', '/builder']; // Example prote
 const authRoutes = ['/auth/signin', '/auth/signup'];
 
 export function middleware(req: NextRequest) {
-  const session = req.cookies.get('next-auth.session-token')
+  // Check for both cookie names that NextAuth uses (HTTP and HTTPS versions)
+  const session = req.cookies.get('next-auth.session-token') || 
+                 req.cookies.get('__Secure-next-auth.session-token')
   const path = req.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
