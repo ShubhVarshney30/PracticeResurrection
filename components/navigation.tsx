@@ -57,12 +57,7 @@ const Navigation = () => {
               >
                 ATS Score
               </Link>
-              <Link
-                href="/docs"
-                className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
-              >
-                Docs
-              </Link>
+             
               <Link
                 href="/contact"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
