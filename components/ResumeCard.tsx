@@ -21,7 +21,7 @@ const ResumeCard = ( { id, title, description, ATS_Score, createdAt, analysisRes
     router.push(`/resumes/${id}?analysisResult=${encodeURIComponent(analysisResult)}&showAnalysis=true`);
   };
   return (
-    <div className={`hover:border-gray-600/50 transition-all duration-200 bg-gray-800 border-gray-700/50 border rounded-xl pt-6 pr-6 pb-6 pl-6 shadow-2xl ${className || ''}`}>
+    <div className={`hover:border-gray-600/50 transition-all duration-200 bg-gray-200 border-gray-700/50 border rounded-xl pt-6 pr-6 pb-6 pl-6 shadow-2xl ${className || ''}`}>
         <div className="flex mb-4 items-start justify-between">
             <div className="p-3 bg-blue-600/20 rounded-lg">
                 <svg
@@ -44,7 +44,7 @@ const ResumeCard = ( { id, title, description, ATS_Score, createdAt, analysisRes
             <p className="text-sm text-gray-400">ATS Score</p>
           </div>
         </div>
-        <h3 className="font-semibold text-lg mb-2 text-white">{title}</h3>
+        <h3 className="font-semibold text-lg mb-2 text-gray-800">{title}</h3>
         <p className="text-gray-400 text-sm mb-4">{description}</p>
         <div className="flex items-center justify-between">
         <span className="text-gray-400 text-sm">Uploaded on {createdAt}</span>

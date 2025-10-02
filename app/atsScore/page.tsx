@@ -618,8 +618,8 @@ export default function Home()  {
         )}
         </div>
         <div className="animate-slide-in-up delay-700">
-            <h2 className="text-2xl font-bold text-left mb-8 mt-8 text-white">Your Resumes</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 className="text-2xl font-bold text-left mb-8 mt-8 text-black">Your Resumes</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 h-100 overflow-auto">
               {uploadedResumes.map((resume, index) => (
                 <ResumeCard 
                   key={resume.id} 
