@@ -49,7 +49,7 @@ const HeroSection = () => {
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               </Link>
-              <Link href="/ats-score">
+              <Link href="/atsScore">
               <Button variant="outline" size="lg">
                 <Target className="w-4 h-4 mr-2" />
                 Get ATS Score

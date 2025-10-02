@@ -146,7 +146,7 @@ export function ResumeManager({ onLoadResume, currentResume }: ResumeManagerProp
           </DialogContent>
         </Dialog>
       </CardHeader>
-      <CardContent>
+      <CardContent className='h-100 overflow-auto' >
         {error && (
           <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
@@ -169,7 +169,7 @@ export function ResumeManager({ onLoadResume, currentResume }: ResumeManagerProp
             </Button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {resumes.map((resume) => (
               <div
                 key={resume.id}
