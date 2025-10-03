@@ -109,7 +109,7 @@ export const generateATSResults = async (resume: File, jobDescription: string, c
       });
       
       const response = await ai.generate({
-        model: googleAI.model(process.env.GEMINI_MODEL || 'gemini-1.5-flash'),
+        model: googleAI.model(process.env.GEMINI_MODEL || 'gemini-2.5-flash'),
         prompt: [
           { text: prompt || ''},
           {
