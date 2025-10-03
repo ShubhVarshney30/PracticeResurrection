@@ -552,7 +552,7 @@ export default function Home()  {
           </svg>
                 {'Analyze Resume'}
               </button>
-              <button 
+              {/* <button 
                 type="submit" 
                 onClick={handleCoverLetter}
                 disabled={isLoading || !isMounted}
@@ -573,7 +573,7 @@ export default function Home()  {
                 />
               </svg>
                 {'Create Cover Letter'}
-              </button>
+              </button> */}
               </div>
             )}
             </div>
